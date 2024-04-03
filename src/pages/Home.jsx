@@ -1,5 +1,5 @@
 import React from "react";
-import { Header } from "../components";
+import { Footer, Header } from "../components";
 import { FaWandMagicSparkles } from "react-icons/fa6";
 
 const Home = () => {
@@ -192,6 +192,8 @@ const Home = () => {
           </p>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 };
