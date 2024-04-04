@@ -1,4 +1,7 @@
 /** @type {import('tailwindcss').Config} */
+
+const { colors: defaultColors } = require("tailwindcss/defaultTheme");
+
 module.exports = {
   daisyui: {
     themes: ["emerald"],
@@ -13,6 +16,7 @@ module.exports = {
   ],
   theme: {
     colors: {
+      ...defaultColors,
       transparent: "transparent",
       current: "currentColor",
       purple: "#8777E2",

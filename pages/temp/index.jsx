@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import SDK from "weavedb-sdk";
 
 const contractTxId = "O-Dmtl-x5kceLHwI0GgFqckpqCKuLysUdtE__5dBspI";
@@ -58,12 +58,15 @@ const Temp = () => {
   useEffect(() => {
     setupWeaveDB();
   }, []);
+
+
   return (
     <div className="flex gap-5">
       <button onClick={() => getData()}> get data</button>
       <button onClick={() => addData()}> add data</button>
       <button onClick={() => updateData()}> update data</button>
       <button onClick={() => deleteData()}> delete data</button>
+ 
     </div>
   );
 };
