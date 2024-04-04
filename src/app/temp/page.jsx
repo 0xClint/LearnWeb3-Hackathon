@@ -4,7 +4,7 @@ import SDK from "weavedb-sdk";
 
 const contractTxId = "O-Dmtl-x5kceLHwI0GgFqckpqCKuLysUdtE__5dBspI";
 
-const temp = () => {
+const Temp = () => {
   const [initDB, setInitDB] = useState(false);
   const [db, setDb] = useState(null);
 
@@ -25,9 +25,18 @@ const temp = () => {
   };
   const addData = async () => {
     await db.set(
-      { task: "t1", user_address: "addr1", date: 1234, done: false },
-      "tasks",
-      "task1"
+      {
+        address: "0xdfsdf",
+        questionId: 2,
+        question: "abcd",
+        details: "efgh",
+        tags: "willTestLater",
+        timeOfCreation: 1712242745,
+        timeBased: false,
+        timeAllotted: 12345,
+      },
+      "question",
+      "2"
     );
   };
 
@@ -59,4 +68,4 @@ const temp = () => {
   );
 };
 
-export default temp;
+export default Temp;

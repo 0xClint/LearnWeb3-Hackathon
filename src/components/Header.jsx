@@ -1,11 +1,12 @@
 import React from "react";
+import Link from "next/link";
 import ConnectWallet from "./ConnectWallet";
 
 const Header = () => {
   return (
     <div className=" navbar bg-base-100 w-[80vw] mx-auto rounded-2xl p-3">
       <div className="flex-1">
-        <a className="btn btn-ghost text-xl font-bold">LOGO</a>
+        <Link className="btn btn-ghost text-xl font-bold" href="/">LOGO</Link>
       </div>
       <div className="flex-none ">
         <ul className="menu menu-horizontal  px-1 mr-2">

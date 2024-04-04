@@ -1,6 +1,7 @@
+"use client";
 import React, { useEffect, useState } from "react";
 import { FaUserLarge } from "react-icons/fa6";
-import ethers from "ethers";
+import { ethers } from "ethers";
 
 const ConnectWallet = () => {
   const [connected, setConnected] = useState(false);
@@ -20,6 +21,10 @@ const ConnectWallet = () => {
       setAccount("");
     }
   }
+
+  useEffect(() => {
+    connectWallet();
+  }, []);
 
   return (
     <div className="flex justify-center items-center">
