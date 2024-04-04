@@ -1,39 +1,26 @@
-import React, { useEffect } from "react";
-import { useMoralis } from "react-moralis";
+import React, { useEffect, useState } from "react";
 import { FaUserLarge } from "react-icons/fa6";
+import ethers from "ethers";
 
 const ConnectWallet = () => {
-  const {
-    enableWeb3,
-    isWeb3Enabled,
-    account,
-    deactivateWeb3,
-    Moralis,
-    isWeb3EnableLoading,
-  } = useMoralis();
+  const [connected, setConnected] = useState(false);
+  //state to store the wallet address that is connected
+  const [account, setAccount] = useState("");
 
-  useEffect(() => {
-    if (isWeb3Enabled) return;
-
-    if (
-      typeof window !== "undefined" &&
-      window.localStorage.getItem("connected")
-    ) {
-      enableWeb3();
+  async function connectWallet() {
+    if (!connected) {
+      const provider = new ethers.BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const _walletAddress = await signer.getAddress();
+      setConnected(true);
+      setAccount(_walletAddress);
+    } else {
+      window.ethereum.selectedAddress = null;
+      setConnected(false);
+      setAccount("");
     }
-  }, [account]);
+  }
 
-  useEffect(() => {
-    // Moralis
-    Moralis.onAccountChanged((account) => {
-      console.log(`Account changed to ${account}`);
-      if (account == null) {
-        window.localStorage.removeItem("connected");
-        deactivateWeb3();
-        console.log("Null account found");
-      }
-    });
-  }, []);
   return (
     <div className="flex justify-center items-center">
       {account ? (
@@ -45,13 +32,7 @@ const ConnectWallet = () => {
       ) : (
         <button
           className="btn hover:scale-[102%] bg-purple text-white"
-          onClick={async () => {
-            await enableWeb3();
-            if (typeof window !== "undefined") {
-              window.localStorage.setItem("connected", "injected");
-            }
-          }}
-          disabled={isWeb3EnableLoading}
+          onClick={connectWallet}
         >
           Connect
         </button>

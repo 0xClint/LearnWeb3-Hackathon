@@ -2,10 +2,6 @@ import React from "react";
 import ConnectWallet from "./ConnectWallet";
 
 const Header = () => {
-  // <div className=" w-screen z-10 top-0 flex flex-col">
-  {
-    /* <div className=" w-screen make-flex"> */
-  }
   return (
     <div className=" navbar bg-base-100 w-[80vw] mx-auto rounded-2xl p-3">
       <div className="flex-1">
