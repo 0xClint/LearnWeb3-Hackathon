@@ -10,7 +10,8 @@ const ConnectWallet = () => {
 
   async function connectWallet() {
     if (!connected) {
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
       const signer = await provider.getSigner();
       const _walletAddress = await signer.getAddress();
       setConnected(true);

@@ -44,7 +44,7 @@ export default function Home() {
         <div className="make-flex">
           <div className="btn btn-outline btn-lg w-36">
             Ask AI
-            <FaWandMagicSparkles />
+            {/* <FaWandMagicSparkles /> */}
           </div>
         </div>
       </div>
