@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Tiptap from "./Tiptap";
 import { v4 as uuidv4 } from "uuid";
 
-const NotePicker = () => {
-  const [content, setContent] = useState("<p>Hello World! 🌎️</p>");
+const NotePicker = ({ content, setContent }) => {
+  // const [content, setContent] = useState("<p>Hello World! 🌎️</p>");
   const handleContentChange = (reason) => {
     setContent(reason);
   };

@@ -1,9 +1,30 @@
 "use client";
 import { Header, Footer } from "@/components";
+import { isValidJSON } from "@/libs/constant";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { FaWandMagicSparkles } from "react-icons/fa6";
+import SDK from "weavedb-sdk";
 
 export default function Home() {
+  const [db, setDb] = useState(null);
+  const [loader, setLoader] = useState(false);
+  const [data, setData] = useState([]);
+
+  const getData = async () => {
+    setLoader(true);
+    const db = new SDK({ contractTxId: process.env.NEXT_PUBLIC_CONTRACT_ID });
+    await db.init();
+    const result = await db.get("questions");
+    setData(result);
+    setLoader(false);
+    console.log(result);
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
+
   return (
     <div className="w-[100vw]">
       <div className="hero-section my-12 mx-20 h-[100vh] bg-purple-gray rounded-3xl py-12">
@@ -26,7 +47,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex mx-20 gap-5">
+      <div className="flex mx-36 gap-5">
         <div className="w-full bg-[#F9F3FF] rounded-2xl">
           <div className="heading p-3 flex ">
             <div>
@@ -45,12 +66,71 @@ export default function Home() {
         <div className="make-flex">
           <div className="btn btn-outline btn-lg w-36">
             Ask AI
-            {/* <FaWandMagicSparkles /> */}
+            <FaWandMagicSparkles />
           </div>
         </div>
       </div>
-      <div className="question-container mx-20 text-left my-5 make-flex flex-col gap-5">
-        <Link href="/questions/1">
+      {loader ? (
+        <span className="loading loading-spinner loading-lg text-purple mx-auto flex my-3"></span>
+      ) : (
+        <div className="question-container mx-36 text-left my-5 make-flex flex-col gap-5">
+          {data?.map(
+            (
+              { address, details, question, tags, timeOfCreation, questionId },
+              index
+            ) => (
+              <Link
+                href={`/questions/${questionId}`}
+                className="w-full"
+                key={index}
+              >
+                <div className="py-5 px-8 border border-purple rounded-xl w-full">
+                  <h2 className="text-[1.4rem] font-semibold">{question}</h2>
+                  <div
+                    className="my-4"
+                    dangerouslySetInnerHTML={{ __html: details }}
+                  />
+                  <div className="flex gap-3">
+                    {isValidJSON(tags)
+                      ? JSON.parse(tags).map((item, index) => (
+                          <div
+                            key={index}
+                            className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold"
+                          >
+                            {item}
+                          </div>
+                        ))
+                      : ""}
+                  </div>
+                </div>
+              </Link>
+            )
+          )}
+          {/* <Link href="/questions/1">
+            <div className="py-5 px-8 border border-purple rounded-xl">
+              <h2 className="text-[1.4rem]  font-semibold">
+                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                labore et dolore magna aliqua. Ut enim ad minim veniam?
+              </h2>
+              <p className="my-4">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+                enim ad minim veniam, quis nostrud exercitation ullamco laboris
+                nisi ut aliquip ex ea commodo consequat.
+              </p>
+              <div className="flex gap-3">
+                <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
+                  about us
+                </div>
+                <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
+                  about us
+                </div>
+                <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
+                  about us
+                </div>
+              </div>
+            </div>
+          </Link>
           <div className="py-5 px-8 border border-purple rounded-xl">
             <h2 className="text-[1.4rem]  font-semibold">
               consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
@@ -74,62 +154,39 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </Link>
-        <div className="py-5 px-8 border border-purple rounded-xl">
-          <h2 className="text-[1.4rem]  font-semibold">
-            consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-            labore et dolore magna aliqua. Ut enim ad minim veniam?
-          </h2>
-          <p className="my-4">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
-          </p>
-          <div className="flex gap-3">
-            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-              about us
+          <div className="py-5 px-8 border border-purple rounded-xl">
+            <h2 className="text-[1.4rem]  font-semibold">
+              consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+              labore et dolore magna aliqua. Ut enim ad minim veniam?
+            </h2>
+            <p className="my-4">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+              enim ad minim veniam, quis nostrud exercitation ullamco laboris
+              nisi ut aliquip ex ea commodo consequat.
+            </p>
+            <div className="flex gap-3">
+              <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
+                about us
+              </div>
+              <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
+                about us
+              </div>
+              <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
+                about us
+              </div>
             </div>
-            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-              about us
-            </div>
-            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-              about us
-            </div>
+          </div> */}
+          <div className="w-full make-flex justify-end items-end">
+            <a
+              className="text-right font-semibold link text-purple-gray"
+              href="#"
+            >
+              more
+            </a>
           </div>
         </div>
-        <div className="py-5 px-8 border border-purple rounded-xl">
-          <h2 className="text-[1.4rem]  font-semibold">
-            consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-            labore et dolore magna aliqua. Ut enim ad minim veniam?
-          </h2>
-          <p className="my-4">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
-          </p>
-          <div className="flex gap-3">
-            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-              about us
-            </div>
-            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-              about us
-            </div>
-            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-              about us
-            </div>
-          </div>
-        </div>
-        <div className="w-full make-flex justify-end items-end">
-          <a
-            className="text-right font-semibold link text-purple-gray"
-            href="#"
-          >
-            more
-          </a>
-        </div>
-      </div>
+      )}
 
       <div className="make-flex mx-[12rem] gap-20 my-[5rem]">
         <div className="w-[600px] h-[500px] bg-purple rounded-3xl"></div>

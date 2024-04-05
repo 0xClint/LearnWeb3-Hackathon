@@ -1,7 +1,12 @@
 "use client";
-import { Footer, Header } from "@/components";
+import { Footer, Header, Loader } from "@/components";
 import NotePicker from "@/components/TextEditor/NotePicker";
 import React, { useState } from "react";
+import { FaWandMagicSparkles } from "react-icons/fa6";
+import SDK from "weavedb-sdk";
+import { v4 as uuidv4 } from "uuid";
+import { ethers } from "ethers";
+import { useRouter } from "next/router";
 
 const tagsData = [
   { id: 1, tag: "a" },
@@ -12,37 +17,94 @@ const tagsData = [
 ];
 
 const Ask = () => {
+  const router = useRouter();
+  const [bountyFlag, setBountyFlag] = useState(false);
+  const [loader, setLoader] = useState(false);
   const [tags, setTags] = useState([]);
   const [title, setTitle] = useState("");
   const [bounty, setBounty] = useState("");
   const [bountyType, setBountyType] = useState(1);
   const [deadline, setDeadline] = useState("");
+  const [content, setContent] = useState("");
 
-  const handleSubmit = (e) => {
+  const addQuestion = async (data) => {
+    const db = new SDK({ contractTxId: process.env.NEXT_PUBLIC_CONTRACT_ID });
+    await db.init();
+    await db.set(data, "questions", data ? data.questionId : "1111");
+    const result = await db.get("questions");
+    console.log(result);
+  };
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    document.getElementById("my_modal_4").showModal();
-    console.log(title, tags);
+    setLoader(true);
+    if (bountyFlag) document.getElementById("my_modal_4").showModal();
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = await provider.getSigner();
+    const account = await signer.getAddress();
+
+    // console.log(title, tags, content);
+
     // Code here=
+    if (!bountyFlag) {
+      const data = {
+        address: account,
+        questionId: uuidv4().slice(0, 8),
+        question: title,
+        details: content,
+        tags: JSON.stringify(tags),
+        timeOfCreation: new Date().toISOString(),
+        timeBased: false,
+        timeAllotted: "0",
+        like: 0,
+        dislike: 0,
+      };
+      console.log(data);
+
+      await addQuestion(data);
+      setTimeout(() => {
+        router.push(`/questions/${data.questionId}`);
+        setLoader(false);
+      }, 3000);
+    }
   };
 
   const submitForm = (event) => {
-    event.preventDefault(); // Prevent default button click behavior
-    handleSubmit(event); // Call the form submission handler
+    event.preventDefault();
+    handleSubmit(event);
   };
 
-  const handleBountySubmit = (e) => {
-    e.preventDefault();
-    console.log(bounty, bountyType);
-    // Code here
-  };
+  const handleBountySubmit = async () => {
+    console.log(bounty, bountyType, deadline, typeof deadline);
+    setLoader(true);
 
-  const submitBountyForm = (event) => {
-    event.preventDefault(); // Prevent default button click behavior
-    handleBountySubmit(event); // Call the form submission handler
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = await provider.getSigner();
+    const account = await signer.getAddress();
+
+    const data = {
+      address: account,
+      questionId: uuidv4().slice(0, 8),
+      question: title,
+      details: content,
+      tags: JSON.stringify(tags),
+      timeOfCreation: new Date().toISOString(),
+      timeBased: true,
+      timeAllotted: deadline,
+      like: 0,
+      dislike: 0,
+    };
+    console.log(data);
+    await addQuestion(data);
+    router.push(`/questions/${data.questionId}`);
+    setLoader(false);
   };
 
   return (
     <div>
+      {/* {loader && <Loader />} */}
       <div className="bg-purple-gray py-4 my-5 mx-20 rounded-3xl">
         <Header />
       </div>
@@ -107,24 +169,33 @@ const Ask = () => {
               Include all information someone would need to answer your question
             </span>
           </div>
-          <NotePicker />
+          <NotePicker content={content} setContent={setContent} />
         </div>
-        <button
-          className="btn btn-outline mr-2 w-40"
-          type="submit"
-          form="myForm"
-          onSubmit={submitForm}
-        >
-          Submit
-        </button>
-        <button
-          className="btn btn-neutral w-40"
-          type="submit"
-          form="myForm"
-          onSubmit={submitForm}
-        >
-          Submit as Bounty
-        </button>
+        <div className="flex justify-between">
+          <div>
+            <button
+              className="btn btn-outline mr-2 w-40"
+              type="submit"
+              form="myForm"
+              onSubmit={submitForm}
+            >
+              Submit
+            </button>
+            <button
+              className="btn btn-neutral w-40"
+              type="submit"
+              form="myForm"
+              onSubmit={submitForm}
+              onClick={() => setBountyFlag(true)}
+            >
+              Submit as Bounty
+            </button>
+          </div>
+          <div className="btn bg-purple text-lg  text-white  w-36  ">
+            Ask AI
+            <FaWandMagicSparkles />
+          </div>
+        </div>
         <dialog id="my_modal_4" className="modal">
           <div className="modal-box w-3/5">
             <h3 className="font-bold text-lg mb-2">Add Bounty</h3>
@@ -172,21 +243,25 @@ const Ask = () => {
                 <input
                   type="datetime-local"
                   placeholder="add amount in $"
+                  value={deadline}
+                  onChange={(e) => setDeadline(e.target.value)}
                   required
                   className="input input-bordered border-[#000000] w-full"
                 />
               </label>
             </form>
             <div className="modal-action w-full make-flex">
-              <form method="dialog">
+              {loader ? (
+                <span className="loading loading-spinner loading-lg"></span>
+              ) : (
                 <button
                   className="btn btn-neutral mx-auto w-32"
-                  onSubmit={submitBountyForm}
-                  disabled={!bounty && !deadline}
+                  onClick={() => handleBountySubmit()}
+                  disabled={!deadline && !bounty}
                 >
-                  Submit
+                  Submitty
                 </button>
-              </form>
+              )}
             </div>
           </div>
         </dialog>

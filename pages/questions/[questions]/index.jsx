@@ -1,10 +1,37 @@
 "use client";
-import { Header, Footer } from "@/components";
-import React from "react";
+import { Header, Footer, CountDownRenderer } from "@/components";
+import { isValidJSON } from "@/libs/constant";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import Countdown from "react-countdown";
 import { FaRegEdit } from "react-icons/fa";
 import { IoMdAdd } from "react-icons/io";
+import SDK from "weavedb-sdk";
+import { FiThumbsDown, FiThumbsUp } from "react-icons/fi";
 
 const Question = () => {
+  const router = useRouter();
+  const [data, setData] = useState("");
+  const [loader, setLoader] = useState(false);
+  const { questions } = router.query;
+  console.log(questions);
+
+  const getData = async () => {
+    if (questions) {
+      setLoader(true);
+      const db = new SDK({ contractTxId: process.env.NEXT_PUBLIC_CONTRACT_ID });
+      await db.init();
+      const result = await db.get("questions", questions);
+      setData(result);
+      console.log(result);
+      setLoader(false);
+    }
+  };
+
+  useEffect(() => {
+    getData();
+  }, [questions]);
+
   return (
     <div>
       <div className="bg-purple-gray py-4 my-5 mx-20 rounded-3xl">
@@ -13,35 +40,27 @@ const Question = () => {
       <div className="flex mx-32">
         <div className="w-full flex flex-col gap-6">
           <div className="p-8 border border-[#FFBBDA] rounded-xl bg-[#FEEAF3] text-left">
-            <h2 className="text-[1.7rem]  font-semibold">
-              consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-              labore et dolore magna aliqua. Ut enim ad minim veniam?
-            </h2>
+            <h2 className="text-[1.7rem]  font-semibold">{data?.question}</h2>
 
             <div className="flex gap-3 my-2">
-              <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-[#6F6698] bg-purple-light font-semibold">
-                about us
-              </div>
-              <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-[#6F6698] bg-purple-light font-semibold">
-                about us
-              </div>
-              <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-[#6F6698] bg-purple-light font-semibold">
-                about us
-              </div>
+              {isValidJSON(data?.tags)
+                ? JSON.parse(data.tags).map((item, index) => (
+                    <div
+                      key={index}
+                      className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold"
+                    >
+                      {item}
+                    </div>
+                  ))
+                : ""}
             </div>
-            <p className="my-3">
-              Pinterest is a place where people re-display images that they've
-              collected from the web. I personally find it maddening. When I
-              search for images, I usually need the info that's meant to be
-              attached to it. Or, I need the source/authorship. Pinterest, by
-              contrast, is about as useful as a gradeschooler's photo collage.
-              Why do Pinterest images need to be in web searches at all?
-              Presumably
-            </p>
+            <div
+              className="my-5"
+              dangerouslySetInnerHTML={{ __html: data?.details }}
+            />
 
             <div className="asked-section make-flex justify-between">
               <div className="make-flex gap-2">
-                {/* You can open the modal using document.getElementById('ID').showModal() method */}
                 <button
                   className="btn bg-purple text-white"
                   onClick={() =>
@@ -65,6 +84,18 @@ const Question = () => {
                     </p>
                   </div>
                 </dialog>
+                <div className="make-flex gap-3 mr-4 ml-3">
+                  <div className="flex font-semibold gap-1">
+                    <FiThumbsUp className="text-2xl cursor-pointer hover:scale-110" />
+                    {data ? data.like : 0}
+                  </div>
+                  <div className="flex font-semibold gap-1">
+                    <FiThumbsDown className="text-2xl cursor-pointer hover:scale-110" />
+                    {data ? data.dislike : 0}
+                    
+                  </div>
+                </div>
+
                 <div className="text-[#858295] text-sm">Asked 7 days ago</div>
               </div>
               <div className="avatar make-flex gap-1">
@@ -154,23 +185,31 @@ const Question = () => {
             </div>
           </div>
         </div>
-        <div className="ml-5 w-[350px] make-flex justify-start flex-col gap-5 text-center">
-          <div className="bg-[#CEC7F4] w-full rounded-2xl p-10 border border-purple">
-            <h2 className="text-[2rem] font-bold leading-9 ">Time Remaining</h2>
+        <div className="ml-5 w-[350px]  text-center">
+          {data?.timeBased ? (
+            <div className="make-flex justify-start flex-col gap-5">
+              <div className="bg-[#CEC7F4] w-full rounded-2xl p-8 border border-purple">
+                <h2 className="text-[2rem] font-bold leading-9 ">
+                  Time Remaining
+                </h2>
+                <Countdown
+                  date={new Date(data?.timeAllotted)}
+                  renderer={CountDownRenderer}
+                />
+              </div>
+              <div className="bg-[#CEC7F4] w-full rounded-2xl p-7 border border-purple">
+                <p className="text-[1.5rem] font-semibold">Pool Bounty</p>
 
-            <span className="countdown font-mono text-2xl my-3">
-              <span style={{ "--value": 10 }}></span>h:
-              <span style={{ "--value": 24 }}></span>m:
-              <span style={{ "--value": 26 }}></span>s
-            </span>
-          </div>
-          <div className="bg-[#CEC7F4] w-full rounded-2xl p-7 border border-purple">
-            <p className="text-[1.5rem] font-semibold">Pool Bounty</p>
-
-            <h2 className="text-[3rem] font-bold leading-tight make-flex gap-2 border border-[#BDBCBC] rounded-lg bg-white my-2">
-              50$
-            </h2>
-          </div>
+                <h2 className="text-[3rem] font-bold leading-tight make-flex gap-2 border border-[#BDBCBC] rounded-lg bg-white my-2">
+                  50$
+                </h2>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-[#CEC7F4] w-full rounded-2xl p-8 border border-purple text-[2rem] font-bold">
+              No Bounty Active 🥲
+            </div>
+          )}
         </div>
       </div>
       <Footer />

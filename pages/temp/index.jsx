@@ -1,8 +1,13 @@
 "use client";
+import { CountDownRenderer } from "@/components";
+import { ethers } from "ethers";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import Countdown from "react-countdown";
+
 import SDK from "weavedb-sdk";
 
-const contractTxId = "O-Dmtl-x5kceLHwI0GgFqckpqCKuLysUdtE__5dBspI";
+const contractTxId = process.env.NEXT_PUBLIC_CONTRACT_ID;
+
 
 const Temp = () => {
   const [initDB, setInitDB] = useState(false);
@@ -20,7 +25,7 @@ const Temp = () => {
   const getData = async () => {
     const db = new SDK({ contractTxId });
     await db.init();
-    const result = await db.get("question");
+    const result = await db.get("questions");
     console.log(result);
   };
   const addData = async () => {
@@ -56,7 +61,10 @@ const Temp = () => {
   };
 
   const authenticate = async () => {
-    const { identity } = await db.createTempAddress();
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    await provider.send("eth_requestAccounts", []);
+    const wallet_address = await provider.getSigner().getAddress();
+    const { identity } = await db.createTempAddress(wallet_address);
     console.log(identity);
   };
 
@@ -71,6 +79,7 @@ const Temp = () => {
       <button onClick={() => updateData()}> update data</button>
       <button onClick={() => deleteData()}> delete data</button>
       <button onClick={() => authenticate()}> authenticate</button>
+      {/* <Countdown date={Date.now() + 10000} renderer={CountDownRenderer} /> */}
     </div>
   );
 };

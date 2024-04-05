@@ -23,8 +23,10 @@
     "next": "13.4.10",
     "ramda": "^0.29.0",
     "react": "18.2.0",
+    "react-countdown": "^2.3.5",
     "react-dom": "18.2.0",
     "react-icons": "^5.0.1",
+    "react-time-ago": "^7.3.1",
     "uuid": "^9.0.1",
     "weavedb-sdk": "^0.27.26"
   },
