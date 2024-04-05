@@ -170,14 +170,14 @@ gap-5 w-full flex-wrap border border-purple-gray"
           <Redo className="w-5 h-5" />
         </button>
       </div>
-      {content && (
+      {/* {content && (
         <button
           type="submit"
           className="px-4 bg-purple-gray text-white py-2 rounded-md"
         >
           Add
         </button>
-      )}
+      )} */}
     </div>
   );
 };

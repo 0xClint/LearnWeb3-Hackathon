@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import ConnectWallet from "./ConnectWallet";
+import { MdSpaceDashboard } from "react-icons/md";
 
 const Header = () => {
   return (
@@ -25,6 +26,11 @@ const Header = () => {
               </ul>
             </details>
           </li> */}
+          <li className="font-semibold">
+            <Link href="/dashboard">
+              <MdSpaceDashboard className="text-lg" />
+            </Link>
+          </li>
           <li className="font-semibold">
             <Link href="/ask">Ask</Link>
           </li>

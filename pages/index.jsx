@@ -13,9 +13,12 @@ export default function Home() {
 
   const getData = async () => {
     setLoader(true);
-    const db = new SDK({ contractTxId: process.env.NEXT_PUBLIC_CONTRACT_ID });
+    const db = new SDK({
+      contractTxId: process.env.NEXT_PUBLIC_QUESTION_CONTRACT_ID,
+    });
     await db.init();
-    const result = await db.get("questions");
+    const result = await db.get("questions", 3, ["timeOfCreation", "desc"]);
+
     setData(result);
     setLoader(false);
     console.log(result);
@@ -86,10 +89,12 @@ export default function Home() {
               >
                 <div className="py-5 px-8 border border-purple rounded-xl w-full">
                   <h2 className="text-[1.4rem] font-semibold">{question}</h2>
-                  <div
-                    className="my-4"
-                    dangerouslySetInnerHTML={{ __html: details }}
-                  />
+                  <div className="w-full max-h-[300px] overflow-y-auto overflow-x-auto">
+                    <div
+                      className="my-5"
+                      dangerouslySetInnerHTML={{ __html: details }}
+                    />
+                  </div>
                   <div className="flex gap-3">
                     {isValidJSON(tags)
                       ? JSON.parse(tags).map((item, index) => (

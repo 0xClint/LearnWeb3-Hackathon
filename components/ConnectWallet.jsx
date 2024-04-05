@@ -30,7 +30,7 @@ const ConnectWallet = () => {
   return (
     <div className="flex justify-center items-center">
       {account ? (
-        <div className="btn flex items-center text-white bg-purple bg-blue-500 gap-2">
+        <div className="btn flex items-center text-white bg-purple hover:bg-[#7B69DF] gap-2">
           <FaUserLarge />
 
           {`${account.slice(0, 4)}..${account.slice(account.length - 4)}`}

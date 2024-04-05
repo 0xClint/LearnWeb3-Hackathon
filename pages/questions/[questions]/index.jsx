@@ -1,187 +1,280 @@
 "use client";
-import { Header, Footer, CountDownRenderer } from "@/components";
-import { isValidJSON } from "@/libs/constant";
+import { Header, Footer, CountDownRenderer, Loader } from "@/components";
+import { getRandomLetter, isValidJSON } from "@/libs/constant";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import Countdown from "react-countdown";
 import { FaRegEdit } from "react-icons/fa";
-import { IoMdAdd } from "react-icons/io";
 import SDK from "weavedb-sdk";
 import { FiThumbsDown, FiThumbsUp } from "react-icons/fi";
+import TimeAgo from "react-timeago";
+import NotePicker from "@/components/TextEditor/NotePicker";
+import Link from "next/link";
+import { ethers } from "ethers";
+import { v4 as uuidv4 } from "uuid";
 
 const Question = () => {
   const router = useRouter();
   const [data, setData] = useState("");
+  const [answerData, setAnswerData] = useState([]);
   const [loader, setLoader] = useState(false);
+  const [content, setContent] = useState("");
+  const [db, setDb] = useState(null);
   const { questions } = router.query;
-  console.log(questions);
 
   const getData = async () => {
+    setLoader(true);
+    const db = new SDK({
+      contractTxId: process.env.NEXT_PUBLIC_QUESTION_CONTRACT_ID,
+    });
+    await db.init();
     if (questions) {
-      setLoader(true);
-      const db = new SDK({ contractTxId: process.env.NEXT_PUBLIC_CONTRACT_ID });
-      await db.init();
       const result = await db.get("questions", questions);
       setData(result);
-      console.log(result);
-      setLoader(false);
+      // console.log(result);
     }
+
+    const _db = new SDK({
+      contractTxId: process.env.NEXT_PUBLIC_ANSWER_CONTRACT_ID,
+    });
+    await _db.init();
+    setDb(_db);
+    const result1 = await _db.get(
+      "answers",
+      ["questionId"],
+      ["questionId", "==", questions]
+    );
+    console.log(result1);
+    setAnswerData(result1);
+    setLoader(false);
   };
 
   useEffect(() => {
     getData();
   }, [questions]);
 
+  const addAnswer = async () => {
+    if (db && content) {
+      setLoader(true);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
+      const account = await signer.getAddress();
+
+      const data = {
+        address: account,
+        questionId: questions,
+        answerId: "ans_" + uuidv4().slice(0, 8),
+        answer: content,
+        timeOfCreation: new Date().toISOString(),
+        comments: "",
+        like: 0,
+        dislike: 0,
+      };
+      console.log(data);
+      await db.set(data, "answers", data ? data.answerId : "1111");
+      const result = await db.get("answers");
+      console.log(result);
+      setTimeout(() => {
+        setLoader(false);
+        window?.location.reload();
+      }, 3000);
+    }
+  };
+  const updateAnswer = async ({ answerId, vote, count }) => {
+    if (db) {
+      setLoader(true);
+      console.log(answerId, vote, count);
+
+      if (vote) await db.update({ like: count }, "answers", answerId);
+      else await db.update({ like: count }, "answers", answerId);
+
+      const result = await db.get("answers");
+      console.log(result);
+      setTimeout(() => {
+        setLoader(false);
+        window?.location.reload();
+      }, 3000);
+    }
+  };
+
+  // useEffect(() => {
+  //   setupWeaveDB();
+  // }, [questions]);
+
   return (
     <div>
+      {loader && <Loader />}
       <div className="bg-purple-gray py-4 my-5 mx-20 rounded-3xl">
         <Header />
       </div>
       <div className="flex mx-32">
         <div className="w-full flex flex-col gap-6">
-          <div className="p-8 border border-[#FFBBDA] rounded-xl bg-[#FEEAF3] text-left">
-            <h2 className="text-[1.7rem]  font-semibold">{data?.question}</h2>
+          {data ? (
+            <div className="p-8 border border-[#FFBBDA] rounded-xl bg-[#FEEAF3] text-left">
+              <h2 className="text-[1.7rem]  font-semibold">{data?.question}</h2>
 
-            <div className="flex gap-3 my-2">
-              {isValidJSON(data?.tags)
-                ? JSON.parse(data.tags).map((item, index) => (
-                    <div
-                      key={index}
-                      className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold"
-                    >
-                      {item}
+              <div className="flex gap-3 my-2">
+                {isValidJSON(data?.tags)
+                  ? JSON.parse(data.tags).map((item, index) => (
+                      <div
+                        key={index}
+                        className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold"
+                      >
+                        {item}
+                      </div>
+                    ))
+                  : ""}
+                <div className="text-[#858295] text-sm make-flex gap-1">
+                  Asked{" "}
+                  <TimeAgo date={data ? data.timeOfCreation : "1 Feb, 2020"} />
+                </div>
+              </div>
+              <div className="w-[900px] max-h-[300px] overflow-y-auto overflow-x-auto">
+                <div
+                  className="my-5"
+                  dangerouslySetInnerHTML={{ __html: data?.details }}
+                />
+              </div>
+
+              <div className="asked-section make-flex justify-between">
+                <div className="make-flex gap-2">
+                  <Link
+                    href="#answer"
+                    className="btn text-white bg-purple hover:bg-[#6E5BDC]"
+                  >
+                    <FaRegEdit />
+                    Answer
+                  </Link>
+
+                  <div className="make-flex gap-3 mr-4 ml-3">
+                    <div className="flex font-semibold gap-1">
+                      <FiThumbsUp className="text-2xl cursor-pointer hover:scale-110" />
+                      {data ? data.like : 0}
                     </div>
-                  ))
-                : ""}
-            </div>
-            <div
-              className="my-5"
-              dangerouslySetInnerHTML={{ __html: data?.details }}
-            />
-
-            <div className="asked-section make-flex justify-between">
-              <div className="make-flex gap-2">
-                <button
-                  className="btn bg-purple text-white"
-                  onClick={() =>
-                    document.getElementById("my_modal_3").showModal()
-                  }
-                >
-                  <FaRegEdit />
-                  Answer
-                </button>
-                <dialog id="my_modal_3" className="modal">
-                  <div className="modal-box">
-                    <form method="dialog">
-                      {/* if there is a button in form, it will close the modal */}
-                      <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-                        ✕
-                      </button>
-                    </form>
-                    <h3 className="font-bold text-lg">Hello!</h3>
-                    <p className="py-4">
-                      Press ESC key or click on ✕ button to close
+                    <div className="flex font-semibold gap-1">
+                      <FiThumbsDown className="text-2xl cursor-pointer hover:scale-110" />
+                      {data ? data.dislike : 0}
+                    </div>
+                  </div>
+                </div>
+                <div className=" make-flex gap-1 w-32 justify-start">
+                  <div className="bg-neutral text-neutral-content rounded-full w-10 h-10 make-flex">
+                    <span className="text-xl">
+                      {/* {getRandomLetter()?.toLocaleUpperCase()} */}D
+                    </span>
+                  </div>
+                  <div className="h-10 make-flex flex-col items-start">
+                    <p className="m-0 leading-5 text-sm font-semibold">
+                      {data
+                        ? `${data.address.slice(0, 4)}..${data.address.slice(
+                            data.address.length - 4
+                          )}`
+                        : 0}
                     </p>
+                    <p className="m-0 leading-5 text-xs">2yr</p>
                   </div>
-                </dialog>
-                <div className="make-flex gap-3 mr-4 ml-3">
-                  <div className="flex font-semibold gap-1">
-                    <FiThumbsUp className="text-2xl cursor-pointer hover:scale-110" />
-                    {data ? data.like : 0}
-                  </div>
-                  <div className="flex font-semibold gap-1">
-                    <FiThumbsDown className="text-2xl cursor-pointer hover:scale-110" />
-                    {data ? data.dislike : 0}
-                    
-                  </div>
-                </div>
-
-                <div className="text-[#858295] text-sm">Asked 7 days ago</div>
-              </div>
-              <div className="avatar make-flex gap-1">
-                <div className="w-11 rounded-full">
-                  <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
-                </div>
-                <div className="h-10 make-flex">
-                  <p className="m-0 leading-5 text-sm font-semibold">Alice</p>
-                  <p className="m-0 leading-5 text-xs">2yr</p>
                 </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <span className="loading loading-spinner loading-md"></span>
+          )}
+
           <div className="divider divider-start my-0">Answers</div>
           <div className="flex flex-col gap-5">
-            <div className="py-5 px-8 border border-purple rounded-xl text-left">
-              <div className="asked-section make-flex justify-between">
-                <div className="avatar make-flex gap-2">
-                  <div className="w-11 rounded-full">
-                    <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
+            {answerData?.map(
+              ({
+                address,
+                questionId,
+                answerId,
+                answer,
+                timeOfCreation,
+                comments,
+                like,
+                dislike,
+              }) => {
+                return (
+                  <div
+                    className="py-5 px-8 border border-purple rounded-xl text-left"
+                    key={answerId}
+                  >
+                    <div className="asked-section make-flex justify-between">
+                      <div className=" make-flex gap-1 w-32 justify-start">
+                        <div className="bg-neutral text-neutral-content rounded-full w-10 h-10 make-flex">
+                          <span className="text-xl">
+                            {/* {getRandomLetter()?.toLocaleUpperCase()} */}D
+                          </span>
+                        </div>
+                        <div className="h-10 make-flex flex-col items-start">
+                          <p className="m-0 leading-5 text-sm font-semibold">
+                            {address.slice(0, 4)}...
+                            {address.slice(address.length - 4)}
+                          </p>
+                          <p className="m-0 leading-5 text-xs">2yr</p>
+                        </div>
+                      </div>
+                      <div className="text-[#858295] text-sm">
+                        Answered{" "}
+                        <TimeAgo
+                          date={timeOfCreation ? timeOfCreation : "1 Feb, 2020"}
+                        />
+                      </div>
+                    </div>
+                    <div className="w-[900px] max-h-[300px] overflow-y-auto overflow-x-auto">
+                      <div
+                        className="my-5"
+                        dangerouslySetInnerHTML={{ __html: answer }}
+                      />
+                    </div>
+                    <div className="make-flex justify-end gap-3 mr-4 ml-3">
+                      <div className="flex font-semibold gap-1">
+                        <FiThumbsUp
+                          className="text-2xl cursor-pointer hover:scale-110"
+                          onClick={() =>
+                            updateAnswer({
+                              answerId,
+                              vote: 1,
+                              count: like ? like + 1 : 0,
+                            })
+                          }
+                        />
+                        {like ? like : 0}
+                      </div>
+                      <div className="flex font-semibold gap-1">
+                        <FiThumbsDown
+                          className="text-2xl cursor-pointer hover:scale-110"
+                          onClick={() =>
+                            updateAnswer({
+                              answerId,
+                              vote: 0,
+                              count: dislike ? dislike + 1 : 0,
+                            })
+                          }
+                        />
+                        {dislike ? dislike : 0}
+                      </div>
+                    </div>
                   </div>
-                  <div className="h-10 make-flex">
-                    <p className="m-0 leading-5 text-sm font-semibold">Alice</p>
-                    <p className="m-0 leading-5 text-xs">2yr</p>
-                  </div>
-                </div>
-                <div className="text-[#858295] text-sm">
-                  answered 5 days ago
-                </div>
-              </div>
-              <p className="my-4">
-                Pinterest is a place where people re-display images that they've
-                collected from the web. I personally find it maddening. When I
-                search for images, I usually need the info that's meant to be
-                attached to it. Or, I need the source/authorship. Pinterest, by
-                contrast, is about as useful as a gradeschooler's photo collage.
-                Why do Pinterest images need to be in web searches at all?
-                Presumably, the original photo and information are out there
-                somewhere… probably on page 17 of Google, after all the
-                Pinterest items.
-              </p>
+                );
+              }
+            )}
+
+            <div className="divider mb-0 font-semibold text-2xl">
+              Your Answer
             </div>
-            <div className="py-5 px-8 border border-purple rounded-xl text-left">
-              <div className="asked-section make-flex justify-between">
-                <div className="avatar make-flex gap-2">
-                  <div className="w-11 rounded-full">
-                    <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
-                  </div>
-                  <div className="h-10 make-flex">
-                    <p className="m-0 leading-5 text-sm font-semibold">Alice</p>
-                    <p className="m-0 leading-5 text-xs">2yr</p>
-                  </div>
-                </div>
-                <div className="text-[#858295] text-sm">
-                  answered 5 days ago
-                </div>
-              </div>
-              <p className="my-4">
-                photo and information are out there somewhere… probably on page
-                17 of Google, after all the Pinterest items.
-              </p>
-            </div>
-            <div className="py-5 px-8 border border-purple rounded-xl text-left">
-              <div className="asked-section make-flex justify-between">
-                <div className="avatar make-flex gap-2">
-                  <div className="w-11 rounded-full">
-                    <img src="https://daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
-                  </div>
-                  <div className="h-10 make-flex">
-                    <p className="m-0 leading-5 text-sm font-semibold">Alice</p>
-                    <p className="m-0 leading-5 text-xs">2yr</p>
-                  </div>
-                </div>
-                <div className="text-[#858295] text-sm">
-                  answered 5 days ago
-                </div>
-              </div>
-              <p className="my-4">
-                Pinterest is a place where people re-display images that they've
-                collected from the web. I personally find it maddening. When I
-                search for images, I usually need the info that's meant to be
-                attached to it after all the Pinterest items.
-              </p>
-            </div>
-            <div className="py-2 text-[1.3rem] cursor-pointer border border-purple rounded-md text-purple make-flex">
-              <IoMdAdd />
+            <div
+              className=" text-[1.3rem] cursor-pointer make-flex flex-col items-start"
+              id="answer"
+            >
+              <h2 className=" "></h2>
+              <NotePicker content={content} setContent={setContent} />
+              <button
+                onClick={() => addAnswer()}
+                className="btn text-white bg-purple hover:bg-[#6E5BDC]"
+              >
+                Post your Answer
+              </button>
             </div>
           </div>
         </div>

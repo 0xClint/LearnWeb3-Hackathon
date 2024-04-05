@@ -9,11 +9,21 @@ import { ethers } from "ethers";
 import { useRouter } from "next/router";
 
 const tagsData = [
-  { id: 1, tag: "a" },
-  { id: 2, tag: "b" },
-  { id: 3, tag: "c" },
-  { id: 4, tag: "d" },
-  { id: 5, tag: "e" },
+  { id: 1, tag: "smart-contracts" },
+  { id: 2, tag: "solidity" },
+  { id: 3, tag: "web3js" },
+  { id: 4, tag: "truffle" },
+  { id: 5, tag: "eth-wallet" },
+  { id: 6, tag: "ether" },
+  { id: 7, tag: "ethereum-classic" },
+  { id: 8, tag: "gas" },
+  { id: 9, tag: "blockchain" },
+  { id: 10, tag: "erc-20" },
+  { id: 11, tag: "Defi" },
+  { id: 12, tag: "metamask" },
+  { id: 13, tag: "ganache" },
+  { id: 14, tag: "web3.py" },
+  { id: 15, tag: "arbitrum" },
 ];
 
 const Ask = () => {
@@ -28,7 +38,9 @@ const Ask = () => {
   const [content, setContent] = useState("");
 
   const addQuestion = async (data) => {
-    const db = new SDK({ contractTxId: process.env.NEXT_PUBLIC_CONTRACT_ID });
+    const db = new SDK({
+      contractTxId: process.env.NEXT_PUBLIC_QUESTION_CONTRACT_ID,
+    });
     await db.init();
     await db.set(data, "questions", data ? data.questionId : "1111");
     const result = await db.get("questions");
@@ -68,6 +80,7 @@ const Ask = () => {
         setLoader(false);
       }, 3000);
     }
+    setLoader(false);
   };
 
   const submitForm = (event) => {
