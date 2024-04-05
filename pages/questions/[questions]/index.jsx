@@ -18,7 +18,7 @@ const Question = () => {
               labore et dolore magna aliqua. Ut enim ad minim veniam?
             </h2>
 
-            <div className="flex gap-3 my-6">
+            <div className="flex gap-3 my-2">
               <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-[#6F6698] bg-purple-light font-semibold">
                 about us
               </div>
@@ -29,6 +29,15 @@ const Question = () => {
                 about us
               </div>
             </div>
+            <p className="my-3">
+              Pinterest is a place where people re-display images that they've
+              collected from the web. I personally find it maddening. When I
+              search for images, I usually need the info that's meant to be
+              attached to it. Or, I need the source/authorship. Pinterest, by
+              contrast, is about as useful as a gradeschooler's photo collage.
+              Why do Pinterest images need to be in web searches at all?
+              Presumably
+            </p>
 
             <div className="asked-section make-flex justify-between">
               <div className="make-flex gap-2">

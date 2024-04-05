@@ -23,6 +23,7 @@ module.exports = {
       "purple-light": "#F9F3FF",
       "purple-gray": "#32303B",
       white: "#FFFFFF",
+      black: "#000000",
     },
     extend: {
       backgroundImage: {

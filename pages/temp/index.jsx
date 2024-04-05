@@ -55,10 +55,14 @@ const Temp = () => {
     await getData();
   };
 
+  const authenticate = async () => {
+    const { identity } = await db.createTempAddress();
+    console.log(identity);
+  };
+
   useEffect(() => {
     setupWeaveDB();
   }, []);
-
 
   return (
     <div className="flex gap-5">
@@ -66,7 +70,7 @@ const Temp = () => {
       <button onClick={() => addData()}> add data</button>
       <button onClick={() => updateData()}> update data</button>
       <button onClick={() => deleteData()}> delete data</button>
- 
+      <button onClick={() => authenticate()}> authenticate</button>
     </div>
   );
 };

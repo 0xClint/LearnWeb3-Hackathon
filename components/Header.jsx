@@ -6,11 +6,13 @@ const Header = () => {
   return (
     <div className=" navbar bg-base-100 w-[80vw] mx-auto rounded-2xl p-3">
       <div className="flex-1">
-        <Link className="btn btn-ghost text-xl font-bold" href="/">LOGO</Link>
+        <Link className="btn btn-ghost text-xl font-bold" href="/">
+          LOGO
+        </Link>
       </div>
       <div className="flex-none ">
         <ul className="menu menu-horizontal  px-1 mr-2">
-          <li>
+          {/* <li>
             <details>
               <summary className="font-semibold">Link 1</summary>
               <ul className="p-2 bg-base-100 rounded-t-none w-32">
@@ -22,19 +24,22 @@ const Header = () => {
                 </li>
               </ul>
             </details>
-          </li>
+          </li> */}
           <li className="font-semibold">
-            <a>Link 2</a>
+            <Link href="/ask">Ask</Link>
           </li>
           <li>
             <details>
               <summary className="font-semibold">chain</summary>
               <ul className="p-2 bg-base-100 rounded-t-none w-32">
                 <li>
-                  <a>Link 1</a>
+                  <a>Arbitrum</a>
                 </li>
                 <li>
-                  <a>Link 2</a>
+                  <a>Etheruem</a>
+                </li>
+                <li>
+                  <a>Polygon</a>
                 </li>
               </ul>
             </details>

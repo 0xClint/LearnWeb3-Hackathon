@@ -1,5 +1,6 @@
 "use client";
-import { Header,Footer } from "@/components";
+import { Header, Footer } from "@/components";
+import Link from "next/link";
 import { FaWandMagicSparkles } from "react-icons/fa6";
 
 export default function Home() {
@@ -49,53 +50,7 @@ export default function Home() {
         </div>
       </div>
       <div className="question-container mx-20 text-left my-5 make-flex flex-col gap-5">
-        <div className="py-5 px-8 border border-purple rounded-xl">
-          <h2 className="text-[1.4rem]  font-semibold">
-            consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-            labore et dolore magna aliqua. Ut enim ad minim veniam?
-          </h2>
-          <p className="my-4">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
-          </p>
-          <div className="flex gap-3">
-            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-              about us
-            </div>
-            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-              about us
-            </div>
-            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-              about us
-            </div>
-          </div>
-        </div>
-        <div className="py-5 px-8 border border-purple rounded-xl">
-          <h2 className="text-[1.4rem]  font-semibold">
-            consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-            labore et dolore magna aliqua. Ut enim ad minim veniam?
-          </h2>
-          <p className="my-4">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
-          </p>
-          <div className="flex gap-3">
-            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-              about us
-            </div>
-            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-              about us
-            </div>
-            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-              about us
-            </div>
-          </div>
-        </div>
-        <div>
+        <Link href="/questions/1">
           <div className="py-5 px-8 border border-purple rounded-xl">
             <h2 className="text-[1.4rem]  font-semibold">
               consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
@@ -119,14 +74,60 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="w-full make-flex justify-end items-end">
-            <a
-              className="text-right font-semibold link text-purple-gray"
-              href="#"
-            >
-              more
-            </a>
+        </Link>
+        <div className="py-5 px-8 border border-purple rounded-xl">
+          <h2 className="text-[1.4rem]  font-semibold">
+            consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+            labore et dolore magna aliqua. Ut enim ad minim veniam?
+          </h2>
+          <p className="my-4">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat.
+          </p>
+          <div className="flex gap-3">
+            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
+              about us
+            </div>
+            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
+              about us
+            </div>
+            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
+              about us
+            </div>
           </div>
+        </div>
+        <div className="py-5 px-8 border border-purple rounded-xl">
+          <h2 className="text-[1.4rem]  font-semibold">
+            consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+            labore et dolore magna aliqua. Ut enim ad minim veniam?
+          </h2>
+          <p className="my-4">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat.
+          </p>
+          <div className="flex gap-3">
+            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
+              about us
+            </div>
+            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
+              about us
+            </div>
+            <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
+              about us
+            </div>
+          </div>
+        </div>
+        <div className="w-full make-flex justify-end items-end">
+          <a
+            className="text-right font-semibold link text-purple-gray"
+            href="#"
+          >
+            more
+          </a>
         </div>
       </div>
 
