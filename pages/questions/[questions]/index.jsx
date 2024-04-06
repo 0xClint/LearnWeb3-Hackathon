@@ -94,7 +94,7 @@ const Question = () => {
       setTimeout(() => {
         setLoader(false);
         window?.location.reload();
-      }, 3000);
+      }, 4000);
     }
   };
 

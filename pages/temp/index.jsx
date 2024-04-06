@@ -74,48 +74,26 @@ const Temp = () => {
   }, []);
 
   const handleAICall = async () => {
-    try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_FLOCK_BOT_ENDPOINT}/chat/conversational_rag_chat`,
-        {
-          question: "What is Ethereum?",
-          knowledge_source_id: "0x7521b754a946844c720a4772f16b0574680223a8",
-        },
-        {
-          headers: {
-            "x-api-key": process.env.NEXT_PUBLIC_FLOCK_BOT_API_KEY,
-            "Content-Type": "application/json", // Ensure API key is set in .env
-          },
-        }
-      );
-      console.log("Response:", response.data);
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    await makePostRequestToServer("What is Etheruem");
   };
 
-  const postData = async (data) => {
-    axios
-      .post(
-        `${process.env.NEXT_PUBLIC_FLOCK_BOT_ENDPOINT}/chat/conversational_rag_chat`,
-        {
-          question: "What is Ethereum?",
-          knowledge_source_id: "0x7521b754a946844c720a4772f16b0574680223a8",
-        },
-        {
-          headers: {
-            "x-api-key": process.env.NEXT_PUBLIC_FLOCK_BOT_API_KEY,
-            "Content-Type": "application/json", // Ensure API key is set in .env
-          },
-        }
-      )
-      .then((res) => {
-        console.log("res", res.data);
-      })
-      .catch((err) => {
-        console.log("error in request", err);
+  async function makePostRequestToServer(prompt) {
+    try {
+      // Define the data to send in the POST request
+      const data = { prompt };
+
+      // Make the POST request to your Node.js server
+      const response = await axios.post("https://learnweb3-backend.onrender.com/api/chatbot", {
+        prompt: "Is Ethereum is turing complete or not?",
       });
-  };
+      console.log(response.data);
+      // Return the response data
+      // return response.data;
+    } catch (error) {
+      console.error("Error:", error);
+      throw error;
+    }
+  }
 
   return (
     <div className="flex gap-5">

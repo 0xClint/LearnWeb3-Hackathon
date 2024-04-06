@@ -67,10 +67,10 @@ export default function Home() {
           </div>
         </div>
         <div className="make-flex">
-          <div className="btn btn-outline btn-lg w-36">
+          <Link href="/ask-AI" className="btn btn-outline btn-lg w-36">
             Ask AI
             <FaWandMagicSparkles />
-          </div>
+          </Link>
         </div>
       </div>
       {loader ? (
