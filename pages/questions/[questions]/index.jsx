@@ -1,6 +1,6 @@
 "use client";
 import { Header, Footer, CountDownRenderer, Loader } from "@/components";
-import { getRandomLetter, isValidJSON } from "@/libs/constant";
+import { getRandomLetter, isValidJSON, random } from "@/libs/constant";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import Countdown from "react-countdown";
@@ -11,11 +11,18 @@ import TimeAgo from "react-timeago";
 import NotePicker from "@/components/TextEditor/NotePicker";
 import Link from "next/link";
 import { ethers } from "ethers";
-import { v4 as uuidv4 } from "uuid";
+import {
+  addAnswerFn,
+  dislikeAnswerFn,
+  getQuestionFn,
+  likeAnswerFn,
+} from "@/libs/contractFunctionCall";
 
 const Question = () => {
   const router = useRouter();
   const [data, setData] = useState("");
+  const [mainBounty, setMainBounty] = useState(0);
+  const [poolBounty, setPoolBounty] = useState(0);
   const [answerData, setAnswerData] = useState([]);
   const [loader, setLoader] = useState(false);
   const [content, setContent] = useState("");
@@ -31,7 +38,15 @@ const Question = () => {
     if (questions) {
       const result = await db.get("questions", questions);
       setData(result);
-      // console.log(result);
+      console.log(result);
+      if (result?.timeBased) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = await provider.getSigner();
+        const { _mainBounty, _bountyPool } = await getQuestionFn(signer);
+        setMainBounty(_mainBounty);
+        setPoolBounty(_bountyPool);
+      }
     }
 
     const _db = new SDK({
@@ -44,8 +59,9 @@ const Question = () => {
       ["questionId"],
       ["questionId", "==", questions]
     );
-    console.log(result1);
+    // console.log(result1);
     setAnswerData(result1);
+
     setLoader(false);
   };
 
@@ -64,7 +80,7 @@ const Question = () => {
       const data = {
         address: account,
         questionId: questions,
-        answerId: "ans_" + uuidv4().slice(0, 8),
+        answerId: "ans_" + random().toString(),
         answer: content,
         timeOfCreation: new Date().toISOString(),
         comments: "",
@@ -74,7 +90,11 @@ const Question = () => {
       console.log(data);
       await db.set(data, "answers", data ? data.answerId : "1111");
       const result = await db.get("answers");
-      console.log(result);
+      await addAnswerFn(
+        signer,
+        Number(data.answerId.slice(4)),
+        Number(questions)
+      );
       setTimeout(() => {
         setLoader(false);
         window?.location.reload();
@@ -85,26 +105,51 @@ const Question = () => {
     if (db) {
       setLoader(true);
       console.log(answerId, vote, count);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
 
-      if (vote) await db.update({ like: count }, "answers", answerId);
-      else await db.update({ like: count }, "answers", answerId);
-
-      const result = await db.get("answers");
-      console.log(result);
+      if (vote) {
+        const res = await likeAnswerFn(signer, Number(answerId.slice(4)));
+        if (res) {
+          document.getElementById("my_modal_1").showModal();
+          setLoader(false);
+          return;
+        }
+        await db.update({ like: count }, "answers", answerId);
+      } else {
+        const res = await dislikeAnswerFn(signer, Number(answerId.slice(4)));
+        if (res) {
+          document.getElementById("my_modal_1").showModal();
+          setLoader(false);
+          return;
+        }
+        await db.update({ like: count }, "answers", answerId);
+      }
+      // const result = await db.get("answers");
+      // console.log(result);
       setTimeout(() => {
         setLoader(false);
         window?.location.reload();
-      }, 4000);
+      }, 1000);
     }
   };
-
-  // useEffect(() => {
-  //   setupWeaveDB();
-  // }, [questions]);
 
   return (
     <div>
       {loader && <Loader />}
+      <dialog id="my_modal_1" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">already liked or disliked</h3>
+          <p className="py-4">You can give only one response!</p>
+          <div className="modal-action">
+            <form method="dialog">
+              {/* if there is a button in form, it will close the modal */}
+              <button className="btn">Close</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
       <div className="bg-purple-gray py-4 my-5 mx-20 rounded-3xl">
         <Header />
       </div>
@@ -235,7 +280,7 @@ const Question = () => {
                             updateAnswer({
                               answerId,
                               vote: 1,
-                              count: like ? like + 1 : 0,
+                              count: like + 1,
                             })
                           }
                         />
@@ -248,7 +293,7 @@ const Question = () => {
                             updateAnswer({
                               answerId,
                               vote: 0,
-                              count: dislike ? dislike + 1 : 0,
+                              count: dislike + 1,
                             })
                           }
                         />
@@ -290,12 +335,23 @@ const Question = () => {
                   renderer={CountDownRenderer}
                 />
               </div>
-              <div className="bg-[#CEC7F4] w-full rounded-2xl p-7 border border-purple">
-                <p className="text-[1.5rem] font-semibold">Pool Bounty</p>
-
-                <h2 className="text-[3rem] font-bold leading-tight make-flex gap-2 border border-[#BDBCBC] rounded-lg bg-white my-2">
-                  50$
-                </h2>
+              <div className="bg-[#CEC7F4] w-full rounded-2xl flex flex-col gap-3 px-7 py-5 border border-purple">
+                <div>
+                  <p className="text-[1.5rem] font-semibold leading-7">
+                    Winner Bounty
+                  </p>
+                  <h2 className="text-[3rem] font-bold leading-tight make-flex gap-2 border border-[#BDBCBC] rounded-lg bg-white my-1">
+                    {mainBounty}$
+                  </h2>
+                </div>
+                <div>
+                  <p className="text-[1.5rem] font-semibold leading-7">
+                    Pool Bounty
+                  </p>
+                  <h2 className="text-[3rem] font-bold leading-tight make-flex gap-2 border border-[#BDBCBC] rounded-lg bg-white my-1">
+                    {poolBounty}$
+                  </h2>
+                </div>
               </div>
             </div>
           ) : (

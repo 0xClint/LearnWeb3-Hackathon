@@ -77,14 +77,14 @@ const Dashboard = () => {
           />
           <div
             role="tabpanel"
-            className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+            className="tab-content bg-base-100 border-base-300 rounded-box p-3"
           >
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               {questionData?.map(({ question, questionId }, index) => {
                 return (
                   <Link
                     href={`/questions/${questionId}`}
-                    className="font-semibold text-[1.2rem]"
+                    className="font-semibold text-[1.2rem]  hover:bg-[#f5f5f5] rounded-md p-4"
                     key={index}
                   >
                     {index + 1}. {question}
@@ -100,25 +100,26 @@ const Dashboard = () => {
             role="tab"
             className="tab"
             aria-label="Answers"
-            checked
+            defaultChecked
           />
           <div
             role="tabpanel"
-            className="tab-content bg-base-100 border-base-300 rounded-box p-6"
+            className="tab-content bg-base-100 border-base-300 rounded-box p-3"
           >
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
               {answerData?.map(({ answer, questionId }, index) => {
                 return (
                   <Link
                     href={`/questions/${questionId}`}
-                    className="font-semibold"
+                    className="font-semibold hover:bg-[#f5f5f5] rounded-md p-4"
                     key={index}
                   >
                     Ans {index + 1}.{" "}
                     <div
-                      className="my-1"
+                      className="my-1 mb-2"
                       dangerouslySetInnerHTML={{ __html: answer }}
                     />
+                    <button className="btn btn-sm text-white bg-purple hover:bg-[#7B69DF]"> collect Bounty</button>
                   </Link>
                 );
               })}

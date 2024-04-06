@@ -4,9 +4,11 @@ import NotePicker from "@/components/TextEditor/NotePicker";
 import React, { useState } from "react";
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import SDK from "weavedb-sdk";
-import { v4 as uuidv4 } from "uuid";
 import { ethers } from "ethers";
 import { useRouter } from "next/router";
+import { addQuestionFn } from "@/libs/contractFunctionCall";
+import { blockchainList, random } from "@/libs/constant";
+import Link from "next/link";
 
 const tagsData = [
   { id: 1, tag: "smart-contracts" },
@@ -32,8 +34,8 @@ const Ask = () => {
   const [loader, setLoader] = useState(false);
   const [tags, setTags] = useState([]);
   const [title, setTitle] = useState("");
-  const [bounty, setBounty] = useState("");
-  const [bountyType, setBountyType] = useState(1);
+  const [poolBounty, setpoolBounty] = useState("");
+  const [winnerBounty, setWinnerBounty] = useState("");
   const [deadline, setDeadline] = useState("");
   const [content, setContent] = useState("");
 
@@ -43,8 +45,8 @@ const Ask = () => {
     });
     await db.init();
     await db.set(data, "questions", data ? data.questionId : "1111");
-    const result = await db.get("questions");
-    console.log(result);
+    // const result = await db.get("questions");
+    // console.log(result);
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -62,7 +64,7 @@ const Ask = () => {
     if (!bountyFlag) {
       const data = {
         address: account,
-        questionId: uuidv4().slice(0, 8),
+        questionId: random().toString(),
         question: title,
         details: content,
         tags: JSON.stringify(tags),
@@ -89,7 +91,13 @@ const Ask = () => {
   };
 
   const handleBountySubmit = async () => {
-    console.log(bounty, bountyType, deadline, typeof deadline);
+    console.log(
+      poolBounty,
+      winnerBounty,
+
+      deadline,
+      typeof deadline
+    );
     setLoader(true);
 
     const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -99,7 +107,7 @@ const Ask = () => {
 
     const data = {
       address: account,
-      questionId: uuidv4().slice(0, 8),
+      questionId: random().toString(),
       question: title,
       details: content,
       tags: JSON.stringify(tags),
@@ -110,14 +118,27 @@ const Ask = () => {
       dislike: 0,
     };
     console.log(data);
-    await addQuestion(data);
-    router.push(`/questions/${data.questionId}`);
+    // console.log(Number(ethers.utils.parseUnits(winnerBounty, "ether")));
+    const _bountyPool = Number(ethers.utils.parseUnits(poolBounty, "ether"));
+    const _mainBounty = Number(ethers.utils.parseUnits(winnerBounty, "ether"));
+    await addQuestionFn(
+      signer,
+      {
+        _questionId: Number(data.questionId),
+        _bountyBased: true,
+        _mainBounty,
+        _bountyPool,
+        _timeOfBounty: Math.floor(new Date().getTime() / 1000),
+      },
+      (Number(poolBounty) + Number(winnerBounty)).toString()
+    );
+    // router.push(`/questions/${data.questionId}`);
     setLoader(false);
   };
 
   return (
     <div>
-      {/* {loader && <Loader />} */}
+      {loader && <Loader />}
       <div className="bg-purple-gray py-4 my-5 mx-20 rounded-3xl">
         <Header />
       </div>
@@ -147,26 +168,48 @@ const Ask = () => {
               className="input input-bordered border-[#000000] w-full text-black"
             />
           </label>
-          <label className="form-control w-full ">
-            <div className="label flex flex-col items-start">
-              <span className="label-text text-lg font-semibold">Tag</span>
-              <span className="label-text text-sm ">
-                Select tags related to your question
-              </span>
-            </div>
-            <select
-              className="select select-bordered w-full max-w-xs border-[#000000]"
-              required
-              onChange={(e) => setTags([...tags, e.target.value])}
-            >
-              <option disabled value={"hh"}>
-                Select an Option
-              </option>
-              {tagsData.map(({ tag, id }) => (
-                <option key={id}>{tag}</option>
-              ))}
-            </select>
-          </label>
+          <div className="flex justify-between">
+            <label className="form-control w-full ">
+              <div className="label flex flex-col items-start">
+                <span className="label-text text-lg font-semibold">Tag</span>
+                <span className="label-text text-sm ">
+                  Select tags related to your question
+                </span>
+              </div>
+              <select
+                className="select select-bordered w-full max-w-xs border-[#000000]"
+                required
+                onChange={(e) => setTags([...tags, e.target.value])}
+              >
+                <option disabled value={"hh"}>
+                  Select an Option
+                </option>
+                {tagsData.map(({ tag, id }) => (
+                  <option key={id}>{tag}</option>
+                ))}
+              </select>
+            </label>
+            <label className="form-control w-full ">
+              <div className="label flex flex-col items-start">
+                <span className="label-text text-lg font-semibold">Chain</span>
+                <span className="label-text text-sm ">
+                  Select chain related to your question
+                </span>
+              </div>
+              <select
+                className="select select-bordered w-full max-w-xs border-[#000000]"
+                required
+                onChange={(e) => setTags([...tags, e.target.value])}
+              >
+                <option disabled value={"hh"}>
+                  Select an Option
+                </option>
+                {blockchainList.map(({ chain, id }) => (
+                  <option key={id}>{chain}</option>
+                ))}
+              </select>
+            </label>
+          </div>
           <div className="make-flex justify-start gap-3">
             {tags.map((item, index) => (
               <div key={index} className="badge badge-outline">
@@ -204,10 +247,13 @@ const Ask = () => {
               Submit as Bounty
             </button>
           </div>
-          <div className="btn bg-purple text-lg  text-white  w-36  ">
+          <Link
+            href="/ask-AI"
+            className="btn bg-purple text-lg  text-white  w-36  "
+          >
             Ask AI
             <FaWandMagicSparkles />
-          </div>
+          </Link>
         </div>
         <dialog id="my_modal_4" className="modal">
           <div className="modal-box w-3/5">
@@ -216,37 +262,34 @@ const Ask = () => {
               <label className="form-control w-full ">
                 <div className="label flex flex-col items-start">
                   <span className="label-text text-md font-semibold">
-                    Bounty Amount
+                    Pool Bounty Amount
                   </span>
                 </div>
                 <input
                   type="number"
-                  placeholder="add amount in $"
+                  placeholder="add amount in Eth"
                   required
-                  value={bounty}
-                  onChange={(e) => setBounty(e.target.value)}
+                  value={poolBounty}
+                  onChange={(e) => setpoolBounty(e.target.value)}
                   className="input input-bordered border-[#000000] w-full"
                 />
               </label>
               <label className="form-control w-full ">
                 <div className="label flex flex-col items-start">
                   <span className="label-text text-md font-semibold">
-                    Select Bounty Type
+                    Winner Bounty Amount
                   </span>
                 </div>
-                <select
-                  className="select select-bordered w-full border-[#000000]"
+                <input
+                  type="number"
+                  placeholder="add amount in Eth"
                   required
-                  value={bountyType}
-                  onChange={(e) => setBountyType(e.target.value)}
-                >
-                  <option disabled value={"hh"}>
-                    Select an Option
-                  </option>
-                  <option value={1}>Winner Bounty</option>
-                  <option value={2}>Pool Bounty</option>
-                </select>
+                  value={winnerBounty}
+                  onChange={(e) => setWinnerBounty(e.target.value)}
+                  className="input input-bordered border-[#000000] w-full"
+                />
               </label>
+
               <label className="form-control w-full ">
                 <div className="label flex flex-col items-start">
                   <span className="label-text text-md font-semibold">
@@ -270,9 +313,9 @@ const Ask = () => {
                 <button
                   className="btn btn-neutral mx-auto w-32"
                   onClick={() => handleBountySubmit()}
-                  disabled={!deadline && !bounty}
+                  disabled={!deadline && !winnerBounty && !poolBounty}
                 >
-                  Submitty
+                  Submit
                 </button>
               )}
             </div>

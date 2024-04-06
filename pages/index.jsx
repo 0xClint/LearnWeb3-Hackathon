@@ -1,6 +1,7 @@
 "use client";
 import { Header, Footer } from "@/components";
 import { isValidJSON } from "@/libs/constant";
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaWandMagicSparkles } from "react-icons/fa6";
@@ -39,13 +40,14 @@ export default function Home() {
             ABOUT US
           </div>
           <h2 className=" font-bold text-[5rem] ">
-            F&Q Website with AI Features
+            Web3 Q&A with Bounty Rewards
           </h2>
-          <p className="w-3/5 mx-auto text-[1.4rem]">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
-            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-            aliquip ex ea commodo consequat.
+          <p className="w-3/5 mx-auto text-[1.4rem] text-center">
+            QueriFi is a web3 Q&A platform where users can ask and create
+            bounties for web3, solidity, and blockchain questions. Rewards are
+            distributed based on votes, with the option for the question creator
+            to allocate a main bounty. Users can also answer questions and get
+            paid simultaneously.
           </p>
         </div>
       </div>
@@ -111,77 +113,7 @@ export default function Home() {
               </Link>
             )
           )}
-          {/* <Link href="/questions/1">
-            <div className="py-5 px-8 border border-purple rounded-xl">
-              <h2 className="text-[1.4rem]  font-semibold">
-                consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                labore et dolore magna aliqua. Ut enim ad minim veniam?
-              </h2>
-              <p className="my-4">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-                enim ad minim veniam, quis nostrud exercitation ullamco laboris
-                nisi ut aliquip ex ea commodo consequat.
-              </p>
-              <div className="flex gap-3">
-                <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-                  about us
-                </div>
-                <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-                  about us
-                </div>
-                <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-                  about us
-                </div>
-              </div>
-            </div>
-          </Link>
-          <div className="py-5 px-8 border border-purple rounded-xl">
-            <h2 className="text-[1.4rem]  font-semibold">
-              consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-              labore et dolore magna aliqua. Ut enim ad minim veniam?
-            </h2>
-            <p className="my-4">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
-            </p>
-            <div className="flex gap-3">
-              <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-                about us
-              </div>
-              <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-                about us
-              </div>
-              <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-                about us
-              </div>
-            </div>
-          </div>
-          <div className="py-5 px-8 border border-purple rounded-xl">
-            <h2 className="text-[1.4rem]  font-semibold">
-              consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-              labore et dolore magna aliqua. Ut enim ad minim veniam?
-            </h2>
-            <p className="my-4">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-              enim ad minim veniam, quis nostrud exercitation ullamco laboris
-              nisi ut aliquip ex ea commodo consequat.
-            </p>
-            <div className="flex gap-3">
-              <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-                about us
-              </div>
-              <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-                about us
-              </div>
-              <div className="badge badge-outline cursor-pointer px-2 py-3 text-sm text-purple bg-purple-light font-semibold">
-                about us
-              </div>
-            </div>
-          </div> */}
+
           <div className="w-full make-flex justify-end items-end">
             <a
               className="text-right font-semibold link text-purple-gray"
@@ -192,18 +124,20 @@ export default function Home() {
           </div>
         </div>
       )}
-
-      <div className="make-flex mx-[12rem] gap-20 my-[5rem]">
-        <div className="w-[600px] h-[500px] bg-purple rounded-3xl"></div>
-        <div className="w-[600px] h-[500px] bg-purple-light rounded-3xl"></div>
+      <div className="make-flex mx-[8rem] gap-16 my-[5rem]">
+        <div className="w-[650px] h-[460px] bg-purple rounded-3xl make-flex flex-col justify-start">
+          <Image src={"/s1.png"} width={600} height={200} />
+          <p className="text-[1.5rem] font-bold">Ask AI</p>
+        </div>
+        <div className="w-[650px] h-[460px] bg-purple-light rounded-3xl make-flex flex-col justify-start">
+          <Image src={"/s2.png"} width={600} height={100} />
+          <p className="text-[1.5rem] font-bold">Get Paid</p>
+        </div>
       </div>
 
       <div className=" bg-purple-gray text-white mx-20 rounded-2xl make-flex gap-12 py-10 px-20 my-20">
         <p className="text-[1.2rem]">
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-          dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-          proident, sunt in culpa qui officia deserunt mollit anim id est
-          laborum.
+        Stay in the loop with our weekly newsletter! Subscribe now to receive top-rated and featured questions straight to your inbox.  
         </p>
         <div className="w-52 ">
           <button className="btn w-36">Subscribe</button>

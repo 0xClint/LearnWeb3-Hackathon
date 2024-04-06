@@ -7,6 +7,7 @@ import Countdown from "react-countdown";
 import SDK from "weavedb-sdk";
 import { AICall } from "../api/hello";
 import axios from "axios";
+import { addQuestionFn, getQuestionFn } from "@/libs/contractFunctionCall";
 
 const contractTxId = process.env.NEXT_PUBLIC_QUESTION_CONTRACT_ID;
 
@@ -83,9 +84,12 @@ const Temp = () => {
       const data = { prompt };
 
       // Make the POST request to your Node.js server
-      const response = await axios.post("https://learnweb3-backend.onrender.com/api/chatbot", {
-        prompt: "Is Ethereum is turing complete or not?",
-      });
+      const response = await axios.post(
+        "https://learnweb3-backend.onrender.com/api/chatbot",
+        {
+          prompt: "Is Ethereum is turing complete or not?",
+        }
+      );
       console.log(response.data);
       // Return the response data
       // return response.data;
@@ -95,6 +99,15 @@ const Temp = () => {
     }
   }
 
+  const addQfn = async () => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = await provider.getSigner();
+    const account = await signer.getAddress();
+
+    await getQuestionFn(signer);
+  };
+
   return (
     <div className="flex gap-5">
       <button onClick={() => getData()}> get data</button>
@@ -102,7 +115,7 @@ const Temp = () => {
       <button onClick={() => updateData()}> update data</button>
       <button onClick={() => deleteData()}> delete data</button>
       <button onClick={() => authenticate()}> authenticate</button>
-      <button onClick={() => handleAICall()}> AI Call</button>
+      <button onClick={() => addQfn()}> Function Call</button>
       {/* <Countdown date={Date.now() + 10000} renderer={CountDownRenderer} /> */}
     </div>
   );
