@@ -121,6 +121,7 @@ export const getQuestionFn = async (signer, questionId) => {
     return {
       _mainBounty: Number(res.mainBounty),
       _bountyPool: Number(res.bountyPool),
+      bountyWinner: res.bountyWinner,
     };
   } catch (error) {
     console.error("Error calling contract function:", error);

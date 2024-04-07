@@ -1,6 +1,6 @@
 import React from "react";
 
-const Completionist = () => <span className="text-[1.3rem] font-semibold">You are good to go!</span>;
+const Completionist = () => <span className="text-[1.3rem] font-semibold">Closed</span>;
 
 const CountDownRenderer = ({ days, hours, minutes, seconds, completed }) => {
   if (completed) {

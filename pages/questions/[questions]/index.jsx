@@ -29,6 +29,7 @@ const Question = () => {
   const [answerData, setAnswerData] = useState([]);
   const [loader, setLoader] = useState(false);
   const [content, setContent] = useState("");
+  const [bountyWinner, setBountyWinner] = useState("");
   const [db, setDb] = useState(null);
   const { questions } = router.query;
 
@@ -49,17 +50,18 @@ const Question = () => {
       console.log(result?.address, account);
 
       if (result?.address == account) {
-        console.log("Your have asked this Question.");
+        console.log("Closed");
         setQuestioner(true);
       }
       if (result?.timeBased) {
-        const { _mainBounty, _bountyPool } = await getQuestionFn(
+        const { _mainBounty, _bountyPool, bountyWinner } = await getQuestionFn(
           signer,
           questions
         );
-        // console.log("_mainBountyPool= ", _mainBounty);
+        console.log("bountyWinner = ", bountyWinner);
         setMainBounty(_mainBounty);
         setPoolBounty(_bountyPool);
+        setBountyWinner(bountyWinner);
       }
     }
 
@@ -404,6 +406,13 @@ const Question = () => {
                     {poolBounty ? ethers.utils.formatEther(poolBounty) : "0"}eth
                   </h2>
                 </div>
+              </div>
+              <div className="bg-[#CEC7F4] w-full rounded-2xl flex flex-col gap-3 px-7 py-5 border border-purple">
+                <h3 className="font-semibold">Main Bounty Winner</h3>
+                <p className="text-[1.5rem] font-semibold leading-7">
+                  {bountyWinner.slice(0, 6)}....
+                  {bountyWinner.slice(bountyWinner.length - 5)}
+                </p>
               </div>
             </div>
           ) : (
