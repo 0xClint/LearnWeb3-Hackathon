@@ -54,7 +54,7 @@ const AskAI = () => {
           <div className="p-10 flex flex-col gap-6">
             {data?.map(({ question, answer }, index) => {
               return (
-                <div>
+                <div key={index}>
                   <p className=" font-semibold">
                     {index + 1}. {question}
                   </p>

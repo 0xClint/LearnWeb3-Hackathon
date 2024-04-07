@@ -1,4 +1,5 @@
 import { Footer, Header, Loader } from "@/components";
+import { collectBountyFn } from "@/libs/contractFunctionCall";
 import { ethers } from "ethers";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
@@ -52,6 +53,16 @@ const Dashboard = () => {
     setLoader(false);
   };
 
+  const collectBountyPool = async (questionId) => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = await provider.getSigner();
+    const res = await collectBountyFn(signer, questionId);
+    if (res) {
+      document.getElementById("my_modal_1").showModal();
+    }
+  };
+
   useEffect(() => {
     getAnswer();
     getQuestions();
@@ -61,6 +72,18 @@ const Dashboard = () => {
       <div className="bg-purple-gray py-4 my-5 mx-20 rounded-3xl">
         <Header />
       </div>
+      <dialog id="my_modal_1" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Bounty already claimed!</h3>
+          <p className="py-4">Bounty has already been distributed.</p>
+          <div className="modal-action">
+            <form method="dialog">
+              {/* if there is a button in form, it will close the modal */}
+              <button className="btn">Close</button>
+            </form>
+          </div>
+        </div>
+      </dialog>
       <h2 className="text-center text-[1.5rem] font-bold my-2">
         Your Dashboard
       </h2>
@@ -109,18 +132,23 @@ const Dashboard = () => {
             <div className="flex flex-col gap-2">
               {answerData?.map(({ answer, questionId }, index) => {
                 return (
-                  <Link
-                    href={`/questions/${questionId}`}
+                  <div
                     className="font-semibold hover:bg-[#f5f5f5] rounded-md p-4"
                     key={index}
                   >
                     Ans {index + 1}.{" "}
-                    <div
+                    <Link
+                      href={`/questions/${questionId}`}
                       className="my-1 mb-2"
                       dangerouslySetInnerHTML={{ __html: answer }}
                     />
-                    <button className="btn btn-sm text-white bg-purple hover:bg-[#7B69DF]"> collect Bounty</button>
-                  </Link>
+                    <button
+                      onClick={() => collectBountyPool(questionId)}
+                      className="btn btn-sm text-white bg-purple hover:bg-[#7B69DF]"
+                    >
+                      collect Bounty
+                    </button>
+                  </div>
                 );
               })}
             </div>

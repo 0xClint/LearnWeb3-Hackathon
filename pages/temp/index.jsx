@@ -7,7 +7,14 @@ import Countdown from "react-countdown";
 import SDK from "weavedb-sdk";
 import { AICall } from "../api/hello";
 import axios from "axios";
-import { addQuestionFn, getQuestionFn } from "@/libs/contractFunctionCall";
+import {
+  addQuestionFn,
+  getAnswerFn,
+  getQuestionFn,
+  getCurrentBountyFn,
+  distributeMainBountyFn,
+} from "@/libs/contractFunctionCall";
+import { getDisplayName } from "next/dist/shared/lib/utils";
 
 const contractTxId = process.env.NEXT_PUBLIC_QUESTION_CONTRACT_ID;
 
@@ -104,8 +111,10 @@ const Temp = () => {
     await provider.send("eth_requestAccounts", []);
     const signer = await provider.getSigner();
     const account = await signer.getAddress();
-
-    await getQuestionFn(signer);
+    await getQuestionFn(signer, 9367815);
+    // await getAnswerFn(signer, 5320693);
+    await getCurrentBountyFn(signer, 9367815,);
+    await distributeMainBountyFn(signer, 9367815, 5340323);
   };
 
   return (

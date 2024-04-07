@@ -14,12 +14,15 @@ import { ethers } from "ethers";
 import {
   addAnswerFn,
   dislikeAnswerFn,
+  distributeMainBountyFn,
   getQuestionFn,
   likeAnswerFn,
 } from "@/libs/contractFunctionCall";
 
 const Question = () => {
   const router = useRouter();
+  const [likeError, setLikeError] = useState(true);
+  const [isQuestioner, setQuestioner] = useState(false);
   const [data, setData] = useState("");
   const [mainBounty, setMainBounty] = useState(0);
   const [poolBounty, setPoolBounty] = useState(0);
@@ -39,11 +42,22 @@ const Question = () => {
       const result = await db.get("questions", questions);
       setData(result);
       console.log(result);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
+      const account = await signer.getAddress();
+      console.log(result?.address, account);
+
+      if (result?.address == account) {
+        console.log("Your have asked this Question.");
+        setQuestioner(true);
+      }
       if (result?.timeBased) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        const signer = await provider.getSigner();
-        const { _mainBounty, _bountyPool } = await getQuestionFn(signer);
+        const { _mainBounty, _bountyPool } = await getQuestionFn(
+          signer,
+          questions
+        );
+        // console.log("_mainBountyPool= ", _mainBounty);
         setMainBounty(_mainBounty);
         setPoolBounty(_bountyPool);
       }
@@ -59,7 +73,7 @@ const Question = () => {
       ["questionId"],
       ["questionId", "==", questions]
     );
-    // console.log(result1);
+    console.log(result1);
     setAnswerData(result1);
 
     setLoader(false);
@@ -89,7 +103,7 @@ const Question = () => {
       };
       console.log(data);
       await db.set(data, "answers", data ? data.answerId : "1111");
-      const result = await db.get("answers");
+      // const result = await db.get("answers");
       await addAnswerFn(
         signer,
         Number(data.answerId.slice(4)),
@@ -116,6 +130,7 @@ const Question = () => {
           setLoader(false);
           return;
         }
+        console.log("answerId= ", answerId);
         await db.update({ like: count }, "answers", answerId);
       } else {
         const res = await dislikeAnswerFn(signer, Number(answerId.slice(4)));
@@ -124,14 +139,29 @@ const Question = () => {
           setLoader(false);
           return;
         }
-        await db.update({ like: count }, "answers", answerId);
+        await db.update({ dislike: count }, "answers", answerId);
       }
-      // const result = await db.get("answers");
-      // console.log(result);
+      const result1 = await db.get(
+        "answers",
+        ["questionId"],
+        ["questionId", "==", questions]
+      );
+      console.log(result1);
       setTimeout(() => {
         setLoader(false);
         window?.location.reload();
-      }, 1000);
+      }, 3000);
+    }
+  };
+
+  const giveMainBounty = async (asnwerId) => {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = await provider.getSigner();
+    const res = await distributeMainBountyFn(signer, questions, asnwerId);
+    if (res) {
+      setLikeError(false);
+      document.getElementById("my_modal_1").showModal();
     }
   };
 
@@ -140,12 +170,20 @@ const Question = () => {
       {loader && <Loader />}
       <dialog id="my_modal_1" className="modal">
         <div className="modal-box">
-          <h3 className="font-bold text-lg">already liked or disliked</h3>
-          <p className="py-4">You can give only one response!</p>
+          <h3 className="font-bold text-lg">
+            {likeError ? "Already liked or disliked" : "Bounty already alloted"}
+          </h3>
+          <p className="py-4">
+            {likeError
+              ? "You can give only one response!"
+              : "Bounty has already been Given"}
+          </p>
           <div className="modal-action">
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
-              <button className="btn">Close</button>
+              <button className="btn" onClick={() => setLikeError(true)}>
+                Close
+              </button>
             </form>
           </div>
         </div>
@@ -184,13 +222,15 @@ const Question = () => {
 
               <div className="asked-section make-flex justify-between">
                 <div className="make-flex gap-2">
-                  <Link
-                    href="#answer"
-                    className="btn text-white bg-purple hover:bg-[#6E5BDC]"
-                  >
-                    <FaRegEdit />
-                    Answer
-                  </Link>
+                  {!isQuestioner && (
+                    <Link
+                      href="#answer"
+                      className="btn text-white bg-purple hover:bg-[#6E5BDC]"
+                    >
+                      <FaRegEdit />
+                      Answer
+                    </Link>
+                  )}
 
                   <div className="make-flex gap-3 mr-4 ml-3">
                     <div className="flex font-semibold gap-1">
@@ -272,32 +312,44 @@ const Question = () => {
                         dangerouslySetInnerHTML={{ __html: answer }}
                       />
                     </div>
-                    <div className="make-flex justify-end gap-3 mr-4 ml-3">
-                      <div className="flex font-semibold gap-1">
-                        <FiThumbsUp
-                          className="text-2xl cursor-pointer hover:scale-110"
-                          onClick={() =>
-                            updateAnswer({
-                              answerId,
-                              vote: 1,
-                              count: like + 1,
-                            })
-                          }
-                        />
-                        {like ? like : 0}
-                      </div>
-                      <div className="flex font-semibold gap-1">
-                        <FiThumbsDown
-                          className="text-2xl cursor-pointer hover:scale-110"
-                          onClick={() =>
-                            updateAnswer({
-                              answerId,
-                              vote: 0,
-                              count: dislike + 1,
-                            })
-                          }
-                        />
-                        {dislike ? dislike : 0}
+                    <div className="make-flex justify-between gap-3">
+                      {isQuestioner ? (
+                        <button
+                          onClick={() => giveMainBounty(answerId.slice(4))}
+                          className="btn text-white bg-purple hover:bg-[#6E5BDC]"
+                        >
+                          Give Bounty
+                        </button>
+                      ) : (
+                        <div></div>
+                      )}
+                      <div className="flex gap-2">
+                        <div className="flex font-semibold gap-1">
+                          <FiThumbsUp
+                            className="text-2xl cursor-pointer hover:scale-110"
+                            onClick={() =>
+                              updateAnswer({
+                                answerId,
+                                vote: 1,
+                                count: like + 1,
+                              })
+                            }
+                          />
+                          {like ? like : 0}
+                        </div>
+                        <div className="flex  font-semibold gap-1">
+                          <FiThumbsDown
+                            className="text-2xl cursor-pointer hover:scale-110"
+                            onClick={() =>
+                              updateAnswer({
+                                answerId,
+                                vote: 0,
+                                count: dislike + 1,
+                              })
+                            }
+                          />
+                          {dislike ? dislike : 0}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -340,16 +392,16 @@ const Question = () => {
                   <p className="text-[1.5rem] font-semibold leading-7">
                     Winner Bounty
                   </p>
-                  <h2 className="text-[3rem] font-bold leading-tight make-flex gap-2 border border-[#BDBCBC] rounded-lg bg-white my-1">
-                    {mainBounty}$
+                  <h2 className="text-[2rem] h-20 font-semibold  leading-tight make-flex gap-2 border border-[#BDBCBC] rounded-lg bg-white my-1">
+                    {mainBounty ? ethers.utils.formatEther(mainBounty) : "0"}eth
                   </h2>
                 </div>
                 <div>
                   <p className="text-[1.5rem] font-semibold leading-7">
                     Pool Bounty
                   </p>
-                  <h2 className="text-[3rem] font-bold leading-tight make-flex gap-2 border border-[#BDBCBC] rounded-lg bg-white my-1">
-                    {poolBounty}$
+                  <h2 className="text-[2rem] h-20 font-semibold leading-tight make-flex gap-2 border border-[#BDBCBC] rounded-lg bg-white my-1">
+                    {poolBounty ? ethers.utils.formatEther(poolBounty) : "0"}eth
                   </h2>
                 </div>
               </div>

@@ -118,7 +118,8 @@ const Ask = () => {
       dislike: 0,
     };
     console.log(data);
-    // console.log(Number(ethers.utils.parseUnits(winnerBounty, "ether")));
+    await addQuestion(data);
+    console.log(ethers.utils.parseEther(winnerBounty, "ether"));
     const _bountyPool = Number(ethers.utils.parseUnits(poolBounty, "ether"));
     const _mainBounty = Number(ethers.utils.parseUnits(winnerBounty, "ether"));
     await addQuestionFn(
@@ -131,8 +132,9 @@ const Ask = () => {
         _timeOfBounty: Math.floor(new Date().getTime() / 1000),
       },
       (Number(poolBounty) + Number(winnerBounty)).toString()
+      // (Number(poolBounty) + Number(winnerBounty)).toString()
     );
-    // router.push(`/questions/${data.questionId}`);
+    router.push(`/questions/${data.questionId}`);
     setLoader(false);
   };
 
