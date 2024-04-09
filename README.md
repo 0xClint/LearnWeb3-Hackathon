@@ -18,6 +18,7 @@ QueriFi, as the name suggests, is for resolving errors encountered while compili
 ![Feature Showcase](https://media.discordapp.net/attachments/1127933096008892478/1227134546428952659/image.png?ex=66274d1a&is=6614d81a&hm=f839bb9a66b31ba1e87582e990f2c37992220eeb2909507f1bfcca4b4253e475&=&format=webp&quality=lossless)
 - Users can earn payment for answers if the question carries a bounty, and they may even win the main prize set by the question creator.
 - To ensure fairness, the main bounty can be reclaimed (See Contract). Additionally, to prevent users from obtaining answers without payment, a bounty pool is available.
+- Ask as many questions you'd like to AI while creating question or anywhere on the platform with AI button on top.
 - Users can express their preference by liking or disliking answers.
 - The distribution of the bounty pool prize is determined based on the like-dislike ratio, for which we have implemented an algorithm to ensure fair distribution.
 - Users can ask cross-chain questions and utilize our tag feature to categorize their queries and facilitate searching.
@@ -35,5 +36,11 @@ Live meetings with mentors or tutors will soon be available for regular question
 - [ ] Implement views and different sorting options on the homepage.
 
 > **NOTE:** The tech stack includes Arbitrum, WeaveDB, Flock.ai, Next.js, Node.js, NoSQL, Solidity, Rust, etc.
+
+<center>
+
+<img src="https://media.discordapp.net/attachments/1127933096008892478/1227149418957115492/image.png?ex=66275af4&is=6614e5f4&hm=8cbb48d2fc4a31b95245432f8682395b63619ef7c191509aed6049d00d0397b2&=&format=webp&quality=lossless&width=365&height=704" alt="Core Working Components" style="width: 20%;"/>
+
+</center>
 
 --- 
