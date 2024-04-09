@@ -37,10 +37,8 @@ Live meetings with mentors or tutors will soon be available for regular question
 
 > **NOTE:** The tech stack includes Arbitrum, WeaveDB, Flock.ai, Next.js, Node.js, NoSQL, Solidity, Rust, etc.
 
-<center>
-
-<img src="https://media.discordapp.net/attachments/1127933096008892478/1227149418957115492/image.png?ex=66275af4&is=6614e5f4&hm=8cbb48d2fc4a31b95245432f8682395b63619ef7c191509aed6049d00d0397b2&=&format=webp&quality=lossless&width=365&height=704" alt="Core Working Components" style="width: 20%;"/>
-
-</center>
+<div style="display: flex; justify-content: center;">
+  <img src="https://media.discordapp.net/attachments/1127933096008892478/1227149418957115492/image.png?ex=66275af4&is=6614e5f4&hm=8cbb48d2fc4a31b95245432f8682395b63619ef7c191509aed6049d00d0397b2&=&format=webp&quality=lossless&width=365&height=704" alt="Core Working Components" style="width: 25%;" />
+</div>
 
 --- 
