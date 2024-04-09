@@ -1,38 +1,39 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## Getting Started
+# QueriFi
 
-First, run the development server:
+QueriFi, as the name suggests, is for resolving errors encountered while compiling your Solidity or XYZ Lang code when you can't find anyone to assist you. Simply ask on QueriFi, and once you find the solution, answer others' queries as well. Ask, Pay, and Earn.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+## Core Working
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+*Before delving into the details below, it's best to watch the project video [here](https://youtu.be/04FjwRdMbcQ?si=r5w3Np9HbPLthP1l) for more technical insights.*
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+| Arbitrum | WeaveDB | Flock.io |
+|---|---|---|
+| QueriFi utilizes **Arbitrum** to manage the distribution of the bounty pool for questions and other rewards provided by the question creator and the platform. We attempted to utilize **Arbitrum Stylus** and experimented with Rust, but ultimately found Solidity to be more straightforward for our use case. Here are all the deployed [contracts](https://github.com/0xClint/LearnWeb3-Hackathon/tree/main/libs/contract) on Arbitrum Sepolia. | For storing all other information such as questions, answers, likes, dislikes, comments, and other core functionalities, we opted for **WeaveDB**. It's fast, easy to use with its web console, and scalable due to its NoSQL nature. Here is the address at which we deployed the database. | To develop the GPT for our platform capable of handling both basic questions and code inquiries intelligently, we utilized Flock.io. We contributed to and deployed it (Node.js) so that we can engage live on our [website](https://learn-web3-hackathon.vercel.app/ask-AI). |
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Features
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+- QueriFi users can ask and answer detailed technical questions and format them as they prefer, whether it's code, comments, or bullet points.
+![Feature Showcase](https://media.discordapp.net/attachments/1127933096008892478/1227134546428952659/image.png?ex=66274d1a&is=6614d81a&hm=f839bb9a66b31ba1e87582e990f2c37992220eeb2909507f1bfcca4b4253e475&=&format=webp&quality=lossless)
+- Users can earn payment for answers if the question carries a bounty, and they may even win the main prize set by the question creator.
+- To ensure fairness, the main bounty can be reclaimed (See Contract). Additionally, to prevent users from obtaining answers without payment, a bounty pool is available.
+- Users can express their preference by liking or disliking answers.
+- The distribution of the bounty pool prize is determined based on the like-dislike ratio, for which we have implemented an algorithm to ensure fair distribution.
+- Users can ask cross-chain questions and utilize our tag feature to categorize their queries and facilitate searching.
+![Feature Showcase](https://media.discordapp.net/attachments/1127933096008892478/1227146270389309511/image.png?ex=66275806&is=6614e306&hm=b484b46cf144f9d51ef092e8606dc70d34177e191943a9a5b928f0f383af17cb&=&format=webp&quality=lossless)
 
-## Learn More
+## Upcoming Features
 
-To learn more about Next.js, take a look at the following resources:
+Live meetings with mentors or tutors will soon be available for regular question-solving sessions, along with a social platform facilitated by **Farcaster**.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [ ] Revert main bounty feature for question creators.
+- [ ] Implement a search bar to search within questions.
+- [ ] Implement a search bar to search through answers.
+- [ ] Add a comment feature on answers.
+- [ ] Enable cross-chain transactions to eliminate the need for wallet changes.
+- [ ] Implement views and different sorting options on the homepage.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+> **NOTE:** The tech stack includes Arbitrum, WeaveDB, Flock.ai, Next.js, Node.js, NoSQL, Solidity, Rust, etc.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+--- 
